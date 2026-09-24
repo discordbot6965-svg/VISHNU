@@ -21,6 +21,9 @@ plugins:
     allowSearch: true
     allowDirectVideoIds: true
     allowDirectPlaylistIds: true
+    oauth:
+      enabled: true
+      # On first start, check the Lavalink console for a code link to authenticate YouTube
     clients:
       - MUSIC
       - ANDROID_TESTSUITE
