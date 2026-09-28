@@ -1,0 +1,61 @@
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { useMainPlayer } = require('discord-player');
+
+module.exports = {
+  data: new SlashCommandBuilder()
+    .setName('playlist-play')
+    .setDescription('Play a saved playlist')
+    .addStringOption(option =>
+      option.setName('name')
+        .setDescription('Name of the playlist to play')
+        .setRequired(true)),
+
+  async execute(interaction) {
+    await interaction.deferReply();
+
+    const playlistName = interaction.options.getString('name').toLowerCase();
+    const userId = interaction.user.id;
+    const voiceChannel = interaction.member.voice.channel;
+
+    if (!voiceChannel) {
+      return interaction.editReply('❌ You must be in a voice channel to play music!');
+    }
+
+    // Check if user has saved playlists
+    const userPlaylists = playlists.get(userId);
+    if (!userPlaylists || !userPlaylists.has(playlistName)) {
+      return interaction.editReply(`❌ No playlist found with the name **"${playlistName}"**.`);
+    }
+
+    const songs = userPlaylists.get(playlistName);
+    if (songs.length === 0) {
+      return interaction.editReply(`❌ Playlist **"${playlistName}"** is empty!`);
+    }
+
+    const player = useMainPlayer();
+
+    try {
+      // Play the first track and queue the rest
+      for (const song of songs) {
+        await player.play(voiceChannel, song, {
+          nodeOptions: {
+            metadata: interaction,
+            leaveOnEnd: true,
+            leaveOnEmpty: true,
+          },
+        });
+      }
+
+      const embed = new EmbedBuilder()
+        .setColor('#57F287')
+        .setTitle(`▶️ Now Playing Playlist: "${playlistName}"`)
+        .setDescription(`Loaded **${songs.length} tracks** into the queue.`)
+        .setFooter({ text: `Requested by ${interaction.user.username}` });
+
+      return interaction.editReply({ embeds: [embed] });
+    } catch (error) {
+      console.error(error);
+      return interaction.editReply('❌ An error occurred while trying to play the playlist.');
+    }
+  },
+};
