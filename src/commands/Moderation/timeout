@@ -1,0 +1,42 @@
+// Command: !timeout @user <duration_in_minutes> [reason]
+    if (command === 'timeout' || command === 'mute') {
+        // 1. Silent check: Only owner can run it, but fails silently/generic if not owner
+        if (!CONFIG.OWNER_IDS.includes(message.author.id)) {
+            return; // Silently ignore non-owner executions
+        }
+
+        // 2. Validate user mention
+        const targetMember = message.mentions.members.first();
+        if (!targetMember) {
+            return message.reply('⚠️ **Usage**: `!timeout @user <minutes> [reason]`');
+        }
+
+        // 3. Validate duration
+        const durationMinutes = parseInt(args[1], 10);
+        if (isNaN(durationMinutes) || durationMinutes <= 0) {
+            return message.reply('⚠️ Please specify a valid duration in minutes.');
+        }
+
+        // 4. Extract reason (no owner mention added)
+        const reason = args.slice(2).join(' ') || 'No reason provided';
+
+        // 5. Hierarchy check
+        if (!targetMember.moderatable) {
+            return message.reply('❌ Cannot timeout this user due to role hierarchy or missing permissions.');
+        }
+
+        try {
+            const durationMs = durationMinutes * 60 * 1000;
+            
+            // Applies timeout without logging owner details in audit reason
+            await targetMember.timeout(durationMs, reason);
+
+            // Generic success message omitting owner details
+            return message.channel.send(
+                `⏱️ **${targetMember.user.tag}** has been timed out for **${durationMinutes} minute(s)**.\n**Reason:** ${reason}`
+            );
+        } catch (error) {
+            console.error(error);
+            return message.reply('❌ An error occurred while executing the timeout.');
+        }
+    }
