@@ -1,32 +1,59 @@
 server:
   port: 2333
   address: 0.0.0.0
-
-lavalink:
-  plugins:
-    - dependency: "dev.lavalink.youtube:youtube-plugin:1.18.2"
-      snapshot: false
-  server:
-    password: "${LAVALINK_PASSWORD:youshallnotpass}"
-    sources:
-      youtube: false # Keep false so the youtube-plugin takes over
-      bandcamp: true
-      soundcloud: true
-      http: true
-      local: false
+  http2:
+    enabled: true
 
 plugins:
   youtube:
     enabled: true
-    allowSearch: true
-    allowDirectVideoIds: true
-    allowDirectPlaylistIds: true
-    # Added fallback client strategies to prevent 403 Forbidden streaming errors
-    clients:
-      - MUSIC
-      - ANDROID_VR
-      - WEB
-      - TVHTML5EMBEDDED
     oauth:
       enabled: true
-      # Check the terminal logs on boot for the https://www.google.com/device link
+
+lavalink:
+  plugins:
+    - dependency: "dev.lavalink.youtube:youtube-plugin:1.11.4"
+      repository: "https://maven.lavalink.dev/releases"
+    - dependency: "com.github.topi314.lavasrc:lavasrc-plugin:4.3.0"
+      repository: "https://maven.lavalink.dev/releases"
+
+  server:
+    password: "youshallnotpass"
+    sources:
+      youtube: false # Disabled in favor of the youtube-plugin above
+      bandcamp: true
+      soundcloud: true
+      twitch: true
+      vimeo: true
+      http: true
+      local: false
+    filters:
+      volume: true
+      equalizer: true
+      karaoke: true
+      timescale: true
+      tremolo: true
+      vibrato: true
+      distortion: true
+      rotation: true
+      channelMix: true
+      lowPass: true
+    bufferDurationMs: 400
+    frameBufferDurationMs: 5000
+    opusEncodingQuality: 10
+    resamplingQuality: HIGH
+    trackStuckThresholdMs: 10000
+    useSeekGhosting: true
+    youtubeSearchEnabled: true
+    soundcloudSearchEnabled: true
+
+metrics:
+  prometheus:
+    enabled: false
+
+logging:
+  file:
+    path: ./logs/lavalink.log
+  level:
+    root: INFO
+    lavalink: INFO
