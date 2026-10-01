@@ -1,108 +1,27 @@
-const { Client, GatewayIntentBits } = require("discord.js");
-const { LavalinkManager } = require("lavalink-client");
+server:
+  port: 2333
+  address: 0.0.0.0
 
-// Initialize the Discord Client
-const client = new Client({
-  intents: [
-    GatewayIntentBits.Guilds,
-    GatewayIntentBits.GuildVoiceStates,
-    GatewayIntentBits.GuildMessages,
-    GatewayIntentBits.MessageContent,
-  ],
-});
+lavalink:
+  server:
+    password: "youshallnotpass"
+    sources:
+      youtube: false # Set to false if using YouTube plugin
+      soundcloud: true
+      bandcamp: true
+      twitch: true
+      vimeo: true
+      http: true
+      local: false
+    bufferDurationMs: 400
+    frameBufferDurationMs: 5000
+    opusEncodingQuality: 10
+    resamplingQuality: HIGH
 
-// Configure Lavalink Manager with multiple nodes
-client.lavalink = new LavalinkManager({
-  nodes: [
-    {
-      id: "Primary-Node",
-      host: "localhost",     // Host IP or domain
-      port: 2333,            // Lavalink port
-      authorization: "youshallnotpass", // Node password
-      secure: false,         // Set to true if using SSL (wss://)
-      retryAmount: 5,        // Retry connections 5 times before failing
-      retryDelay: 3000,      // Wait 3s between retries
-    },
-    {
-      id: "Fallback-Node",
-      host: "127.0.0.1",
-      port: 2334,
-      authorization: "youshallnotpass",
-      secure: false,
-    },
-  ],
-  sendToShard: (guildId, payload) => {
-    // Forward gateway payloads to Discord shards
-    client.guilds.cache.get(guildId)?.shard.send(payload);
-  },
-  client: {
-    id: "YOUR_BOT_CLIENT_ID", // Your Discord Bot Application ID
-  },
-  // Load balance across nodes automatically
-  defaultSearchPlatform: "ytsearch",
-});
-
-// 1. Listen for raw gateway events and send voice updates to Lavalink
-client.on("raw", (data) => client.lavalink.sendRawData(data));
-
-// 2. Lavalink Node Connection Lifecycle Listeners
-client.lavalink.nodeManager.on("connect", (node) => {
-  console.log(`[Lavalink] Connected to node: ${node.id} (${node.options.host}:${node.options.port})`);
-});
-
-client.lavalink.nodeManager.on("disconnect", (node, reason) => {
-  console.warn(`[Lavalink] Disconnected from node: ${node.id}. Reason:`, reason);
-});
-
-client.lavalink.nodeManager.on("error", (node, error) => {
-  console.error(`[Lavalink] Error on node ${node.id}:`, error);
-});
-
-client.lavalink.nodeManager.on("reconnecting", (node) => {
-  console.log(`[Lavalink] Attempting to reconnect to node: ${node.id}...`);
-});
-
-// 3. Initialize Lavalink upon Discord Bot Ready
-client.on("ready", async () => {
-  console.log(`Bot logged in as ${client.user.tag}`);
-  
-  // Connect all configured Lavalink nodes to Discord
-  await client.lavalink.init(client.user);
-});
-
-// 4. Basic Command Listener to Create Players on Connected Nodes
-client.on("messageCreate", async (message) => {
-  if (message.author.bot || !message.guild) return;
-
-  const args = message.content.split(" ");
-  const command = args.shift().toLowerCase();
-
-  if (command === "!play") {
-    const query = args.join(" ");
-    if (!query) return message.reply("Please provide a song name or URL.");
-
-    const voiceChannel = message.member.voice.channel;
-    if (!voiceChannel) return message.reply("Join a voice channel first!");
-
-    // Checks available nodes and assigns player to the healthiest node
-    const player = client.lavalink.createPlayer({
-      guildId: message.guild.id,
-      voiceChannelId: voiceChannel.id,
-      textChannelId: message.channel.id,
-      selfDeaf: true,
-    });
-
-    await player.connect();
-
-    // Perform search on the assigned node
-    const res = await player.search({ query }, message.author);
-    if (!res || !res.tracks.length) return message.reply("No tracks found.");
-
-    player.queue.add(res.tracks[0]);
-    message.reply(`Added to queue: **${res.tracks[0].info.title}**`);
-
-    if (!player.playing) await player.play();
-  }
-});
-
-client.login("YOUR_BOT_TOKEN");
+logging:
+  file:
+    max-history: 7
+    max-size: 1MB
+  level:
+    root: INFO
+    lavalink: INFO
