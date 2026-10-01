@@ -30,3 +30,4 @@ plugins:
     oauth:
       enabled: true
       # Check the terminal logs on boot for the https://www.google.com/device link
+
