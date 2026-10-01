@@ -1,59 +1,37 @@
 server:
   port: 2333
   address: 0.0.0.0
-  http2:
-    enabled: true
-
-plugins:
-  youtube:
-    enabled: true
-    oauth:
-      enabled: true
 
 lavalink:
   plugins:
-    - dependency: "dev.lavalink.youtube:youtube-plugin:1.11.4"
-      repository: "https://maven.lavalink.dev/releases"
-    - dependency: "com.github.topi314.lavasrc:lavasrc-plugin:4.3.0"
-      repository: "https://maven.lavalink.dev/releases"
-
+    # Optional: Add plugins like Youtube source, Spotify, etc.
   server:
     password: "youshallnotpass"
     sources:
-      youtube: false # Disabled in favor of the youtube-plugin above
+      youtube: false # Set to true or use youtube-plugin for YouTube support
       bandcamp: true
       soundcloud: true
       twitch: true
       vimeo: true
       http: true
       local: false
-    filters:
-      volume: true
-      equalizer: true
-      karaoke: true
-      timescale: true
-      tremolo: true
-      vibrato: true
-      distortion: true
-      rotation: true
-      channelMix: true
-      lowPass: true
     bufferDurationMs: 400
     frameBufferDurationMs: 5000
     opusEncodingQuality: 10
     resamplingQuality: HIGH
     trackStuckThresholdMs: 10000
-    useSeekGhosting: true
-    youtubeSearchEnabled: true
-    soundcloudSearchEnabled: true
 
 metrics:
   prometheus:
     enabled: false
 
+sentry:
+  dsn: ""
+
 logging:
   file:
-    path: ./logs/lavalink.log
+    max-history: 30
+    max-size: 1MB
   level:
     root: INFO
     lavalink: INFO
