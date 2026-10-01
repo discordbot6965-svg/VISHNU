@@ -6,7 +6,7 @@ lavalink:
   server:
     password: "youshallnotpass"
     sources:
-      youtube: false # Set to false if using YouTube plugin
+      youtube: false # Set false to prevent youtube-plugin database indexing
       soundcloud: true
       bandcamp: true
       twitch: true
@@ -17,22 +17,10 @@ lavalink:
     frameBufferDurationMs: 5000
     opusEncodingQuality: 10
     resamplingQuality: HIGH
+    trackStuckThresholdMs: 10000
 
+# Completely disables file/database logging (prints directly to console only)
 logging:
-  file:
-    max-history: 7
-    max-size: 1MB
   level:
     root: INFO
     lavalink: INFO
-    plugins:
-  youtube:
-    enabled: true
-    allowSearch: true
-    allowDirectVideoIds: true
-    allowDirectPlaylistIds: true
-    # Disable persistent database caching if it causes crashes
-    clients:
-      - MUSIC
-      - WEB
-      - TVHTML5
