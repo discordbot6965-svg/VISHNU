@@ -3,24 +3,30 @@ server:
   address: 0.0.0.0
 
 lavalink:
+  plugins:
+    - dependency: "dev.lavalink.youtube:youtube-plugin:1.18.2"
+      snapshot: false
   server:
-    password: "youshallnotpass"
+    password: "${LAVALINK_PASSWORD:youshallnotpass}"
     sources:
-      youtube: false # Set false to prevent youtube-plugin database indexing
-      soundcloud: true
+      youtube: false # Keep false so the youtube-plugin takes over
       bandcamp: true
-      twitch: true
-      vimeo: true
+      soundcloud: true
       http: true
       local: false
-    bufferDurationMs: 400
-    frameBufferDurationMs: 5000
-    opusEncodingQuality: 10
-    resamplingQuality: HIGH
-    trackStuckThresholdMs: 10000
 
-# Completely disables file/database logging (prints directly to console only)
-logging:
-  level:
-    root: INFO
-    lavalink: INFO
+plugins:
+  youtube:
+    enabled: true
+    allowSearch: true
+    allowDirectVideoIds: true
+    allowDirectPlaylistIds: true
+    # Added fallback client strategies to prevent 403 Forbidden streaming errors
+    clients:
+      - MUSIC
+      - ANDROID_VR
+      - WEB
+      - TVHTML5EMBEDDED
+    oauth:
+      enabled: true
+      # Check the terminal logs on boot for the https://www.google.com/device link
