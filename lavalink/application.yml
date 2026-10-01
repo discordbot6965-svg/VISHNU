@@ -25,3 +25,14 @@ logging:
   level:
     root: INFO
     lavalink: INFO
+    plugins:
+  youtube:
+    enabled: true
+    allowSearch: true
+    allowDirectVideoIds: true
+    allowDirectPlaylistIds: true
+    # Disable persistent database caching if it causes crashes
+    clients:
+      - MUSIC
+      - WEB
+      - TVHTML5
