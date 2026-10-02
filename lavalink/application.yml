@@ -4,12 +4,12 @@ server:
 
 lavalink:
   plugins:
-    - dependency: "dev.lavalink.youtube:youtube-plugin:1.18.2"
+    - dependency: "dev.lavalink.youtube:youtube-plugin:1.13.5"
       snapshot: false
   server:
     password: "${LAVALINK_PASSWORD:youshallnotpass}"
     sources:
-      youtube: false # Keep false so the youtube-plugin takes over
+      youtube: false
       bandcamp: true
       soundcloud: true
       http: true
@@ -21,12 +21,6 @@ plugins:
     allowSearch: true
     allowDirectVideoIds: true
     allowDirectPlaylistIds: true
-    # Added fallback client strategies to prevent 403 Forbidden streaming errors
     clients:
       - MUSIC
-      - ANDROID_VR
-      - WEB
-      - TVHTML5EMBEDDED
-    oauth:
-      enabled: true
-      # Check the terminal logs on boot for the https://www.google.com/device link
+      - ANDROID_TESTSUITE
